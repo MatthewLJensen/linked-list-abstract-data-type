@@ -142,7 +142,7 @@ void LinkedList::insert(const Iterator& iter, const string& item) {
 void LinkedList::remove(Iterator& iter) {
 
 	// I think this would be better handled by simple preventing an iterator from incrementing to or past the beginning or end.
-	if (this->begin() == this->end() || iter.ptr == (--begin()).ptr || iter.ptr == this->end().ptr) { //nothing should be removed from an empty list | The iterator should not be the head node | The iterator should not be the end node
+	if (this->begin() == this->end() || iter.ptr == (--begin()).ptr || iter.ptr == this->end().ptr) { //nothing should be removed from an empty list || The iterator should not be the head node || The iterator should not be the end node
 		return;
 	}
 

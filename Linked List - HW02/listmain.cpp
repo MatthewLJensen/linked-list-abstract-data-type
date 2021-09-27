@@ -4,6 +4,7 @@
 #include <algorithm>   // For std::for_each
 #include "llist.h"   
 
+
 int main() {
     std::cout << "Starting program\n";
     // Make an empty list
@@ -144,8 +145,36 @@ int main() {
     std::for_each(test6.begin(), test6.end(),
         [](const string& s) { std::cout << s << ' '; });
     std::cout << "\n";
-    LinkedList empty;
+
+
+
+    //test huge list
+    std::cout << std::boolalpha << "Testing if a huge list works. adding 10000, removing 9995" << "\n";
+    LinkedList huge_list;
+    for (int i = 0; i < 10000; i++) {
+        huge_list.insert(huge_list.begin(), std::to_string(i));
+    }
+    for (int i = 0; i < 9995; i++) {
+        huge_list.remove(--(huge_list.end()));
+    }
+    std::for_each(huge_list.begin(), huge_list.end(),
+        [](const string& s) { std::cout << s << ' '; });
+    std::cout << "\n";
+    
+    std::cout << std::boolalpha << "adding 10000 more, then clearing, then adding a couple strings" << "\n";
+    for (int i = 0; i < 10000; i++) {
+        huge_list.insert(huge_list.begin(), std::to_string(i));
+    }
+    huge_list.clear();
+    huge_list.insert(huge_list.end(), "test");
+    huge_list.insert(huge_list.end(), "test2");
+    std::for_each(huge_list.begin(), huge_list.end(),
+        [](const string& s) { std::cout << s << ' '; });
+    std::cout << "\n";
+    std::cout << "Length of huge list (should be 2): " << huge_list.length() << "\n\n";
+
     // Print the empty list backwards
+    LinkedList empty;
     std::cout << "Print empty backwards: \n";
     std::cout << '[';
     p = empty.end();
@@ -153,6 +182,8 @@ int main() {
         std::cout << *p << ' ';
     }
     std::cout << "]\n";
+
+
 
 
 
