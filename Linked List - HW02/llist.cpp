@@ -1,9 +1,9 @@
-//  Name: Matthew Jensen
-//  Assignment number: 3/2 (for both 318 and 571)
+//  Name: Matthew Jensen, Hayden Rigsby
+//  Assignment number: 3
 //  Assignment: Linked List Implementation
 //  File name: llist.cpp
-//  Date last modified: September 21, 2021
-//  Honor statement: I have neither given nor received any unauthorized help on this assignment. 
+//  Date last modified: September 29, 2021
+//  Honor statement: We have neither given nor received any unauthorized help on this assignment. 
 
 
 #include "llist.h"
@@ -14,8 +14,7 @@ LinkedList::Node::Node(const string& item) :
 
 
 //Iterator Constructor
-LinkedList::Iterator::Iterator(LinkedList::Node* p) :
-	ptr(p) {}
+LinkedList::Iterator::Iterator(LinkedList::Node* p) : ptr(p) {}
 
 
 //Iterator Operators
@@ -40,7 +39,9 @@ LinkedList::Iterator LinkedList::Iterator::operator++(int) {
 
 //Predecrement
 LinkedList::Iterator& LinkedList::Iterator::operator--() {
-	//handle edge case where someone decrements prior to beginning
+	
+	if (this->ptr )
+
 	this->ptr = this->ptr->prev;
 	return *this;
 }
@@ -62,7 +63,7 @@ bool LinkedList::Iterator::operator!=(const Iterator& other) {
 }
 
 //LinkedList Constructor
-LinkedList::LinkedList() : head(new LinkedList::Node(std::string())), tail(new LinkedList::Node(std::string())), len(0)
+LinkedList::LinkedList() : head(new LinkedList::Node(std::string("*HEAD*"))), tail(new LinkedList::Node(std::string("*TAIL*"))), len(0)
 {
 	head->next = tail;
 	tail->prev = head;
@@ -70,7 +71,7 @@ LinkedList::LinkedList() : head(new LinkedList::Node(std::string())), tail(new L
 }
 
 //LinkedList Copy Constructor
-LinkedList::LinkedList(const LinkedList& other) : head(new LinkedList::Node(std::string())), tail(new LinkedList::Node(std::string())), len(0)
+LinkedList::LinkedList(const LinkedList& other) : head(new LinkedList::Node(std::string("*HEAD*"))), tail(new LinkedList::Node(std::string("*TAIL*"))), len(0)
 {
 	head->next = tail;
 	tail->prev = head;
@@ -78,7 +79,7 @@ LinkedList::LinkedList(const LinkedList& other) : head(new LinkedList::Node(std:
 	LinkedList::Iterator copier = other.begin();
 	LinkedList::Iterator iter = this->begin();
 
-	while (copier.ptr) {
+	while (copier.ptr->next) {
 		this->insert(iter, copier.ptr->data);
 		copier++;
 
@@ -101,6 +102,10 @@ LinkedList::~LinkedList() {
 }
 
 LinkedList& LinkedList::operator=(const LinkedList& other) {
+	if (*this == other) {
+		return *this;
+	}
+
 	this->clear();
 	this->head->next = this->tail;
 	this->tail->prev = this->head;
@@ -129,6 +134,12 @@ LinkedList::Iterator LinkedList::end() const {
 }
 
 void LinkedList::insert(const Iterator& iter, const string& item) {
+
+	if (iter.ptr == (--begin()).ptr || iter.ptr == (++end()).ptr) { //nothing should be added prior to the beginning | nothing should be inserted after the end sentinal node
+		return;
+	}
+
+
 	LinkedList::Node* item_node = new LinkedList::Node(item);
 
 	iter.ptr->prev->next = item_node;
@@ -136,13 +147,12 @@ void LinkedList::insert(const Iterator& iter, const string& item) {
 	item_node->next = iter.ptr;
 	iter.ptr->prev = item_node;
 
-	len++;
+	this->len++;
 }
 
 void LinkedList::remove(Iterator& iter) {
 
-	// I think this would be better handled by simple preventing an iterator from incrementing to or past the beginning or end.
-	if (this->begin() == this->end() || iter.ptr == (--begin()).ptr || iter.ptr == this->end().ptr) { //nothing should be removed from an empty list || The iterator should not be the head node || The iterator should not be the end node
+	if (this->begin() == this->end() || iter.ptr == (--begin()).ptr || iter.ptr == this->end().ptr) { //nothing should be removed from an empty list | The iterator should not be the head node | The iterator should not be the end node
 		return;
 	}
 
@@ -150,7 +160,7 @@ void LinkedList::remove(Iterator& iter) {
 	iter.ptr->next->prev = iter.ptr->prev;
 
 	Iterator tmp = iter;
-	iter.ptr = iter.ptr->prev;
+	iter.ptr = iter.ptr->next;
 	delete(tmp.ptr);
 
 	len--;
@@ -159,9 +169,8 @@ void LinkedList::remove(Iterator& iter) {
 
 
 LinkedList::Iterator LinkedList::find(const string& seek) const {
-	//why can't I do this: test1.remove(test1.find("test"));
 	LinkedList::Iterator iter = begin();
-	while (iter.ptr->data != seek) {
+	while (iter.ptr->data != seek && iter.ptr->next) {
 		iter++;
 	}
 	return iter;
@@ -188,6 +197,10 @@ void LinkedList::clear() {
 }
 
 bool LinkedList::operator==(const LinkedList& other) const {
+	if (this->length() != other.length()) {
+		return false;
+	}
+
 	LinkedList::Iterator this_iter = this->begin();
 	LinkedList::Iterator other_iter = other.begin();
 	while (this_iter.ptr->next) {
@@ -201,15 +214,5 @@ bool LinkedList::operator==(const LinkedList& other) const {
 }
 
 bool LinkedList::operator!=(const LinkedList& other) const {
-	//Why can't I do this: return(!(this == &other));
-	LinkedList::Iterator this_iter = this->begin();
-	LinkedList::Iterator other_iter = other.begin();
-	while (this_iter.ptr->next) {
-		if (this_iter.ptr->data != other_iter.ptr->data) {
-			return true;
-		}
-		this_iter++;
-		other_iter++;
-	}
-	return false;
+	return !(*this == other);
 }

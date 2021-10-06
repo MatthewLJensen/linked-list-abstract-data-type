@@ -139,6 +139,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="doctest.h" />
     <ClInclude Include="llist.h" />
   </ItemGroup>
   <ItemGroup>
